@@ -31,7 +31,7 @@ impl Board {
         Ok(empty_board)
     }
 
-    pub fn solve(self) -> impl Iterator<Item = Board> {
+    pub fn solve(self) -> impl Iterator<Item = SolvedBoard> {
         SolveIterator::new(self, Brick::all_bricks())
     }
 
@@ -119,25 +119,36 @@ impl fmt::Display for Board {
     }
 }
 
+pub struct SolvedBoard {
+    pub placed_bricks: Vec<u64>,
+    pub test_count: u32,
+}
+
 struct SolveIterator {
     stack: Vec<(Board, Vec<Brick>)>,
+    test_count: u32,
 }
 
 impl SolveIterator {
     fn new(board: Board, remaining_bricks: Vec<Brick>) -> Self {
         SolveIterator {
             stack: vec![(board, remaining_bricks)],
+            test_count: 0,
         }
     }
 }
 
 impl Iterator for SolveIterator {
-    type Item = Board;
+    type Item = SolvedBoard;
 
     fn next(&mut self) -> Option<Self::Item> {
         while let Some((current_board, mut bricks)) = self.stack.pop() {
+            self.test_count += 1;
             if bricks.is_empty() {
-                return Some(current_board);
+                return Some(SolvedBoard {
+                    placed_bricks: current_board.placed_bricks,
+                    test_count: self.test_count,
+                });
             }
 
             if let Some(brick) = bricks.pop() {
