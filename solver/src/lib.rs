@@ -48,7 +48,7 @@ impl Board {
         (1_u64 << 63 >> index & self.bitboard) > 0
     }
     fn valid_placements<'a>(&'a self, brick: &'a Brick) -> ValidPlacementIterator<'a> {
-        ValidPlacementIterator::create(self, brick)
+        ValidPlacementIterator::new(self, brick)
     }
 }
 
@@ -60,7 +60,7 @@ struct ValidPlacementIterator<'a> {
 }
 
 impl ValidPlacementIterator<'_> {
-    fn create<'a>(board: &'a Board, brick: &'a Brick) -> ValidPlacementIterator<'a> {
+    fn new<'a>(board: &'a Board, brick: &'a Brick) -> ValidPlacementIterator<'a> {
         ValidPlacementIterator {
             index: 0,
             brick_index: 0,
@@ -73,10 +73,10 @@ impl ValidPlacementIterator<'_> {
 impl Iterator for ValidPlacementIterator<'_> {
     type Item = Board;
     fn next(&mut self) -> Option<<Self as Iterator>::Item> {
-        while self.brick_index < self.brick.bit_patterns.len() {
-            let brick_pattern = self.brick.bit_patterns.get(self.brick_index)?;
+        while self.brick_index < self.brick.brick_variants.len() {
+            let brick_variant = self.brick.brick_variants.get(self.brick_index)?;
             while self.index <= 42_usize {
-                let indexed_brick_pattern = brick_pattern >> self.index;
+                let indexed_brick_pattern = brick_variant.bit_pattern >> self.index;
                 self.index += 1;
                 if (self.board.bitboard & indexed_brick_pattern) == 0 {
                     let mut placed_bricks = self.board.placed_bricks.clone();
@@ -164,77 +164,88 @@ impl Iterator for SolveIterator {
 }
 
 #[derive(Clone)]
+struct BrickVariant {
+    bit_pattern: u64,
+}
+
+impl BrickVariant {
+    fn new(bit_pattern: u64) -> Self {
+        BrickVariant { bit_pattern }
+    }
+}
+
+#[derive(Clone)]
 struct Brick {
-    bit_patterns: Vec<u64>,
+    brick_variants: Vec<BrickVariant>,
 }
 
 impl Brick {
-    fn create(bit_patterns: Vec<u64>) -> Brick {
-        Brick { bit_patterns }
+    fn new(brick_variants: Vec<BrickVariant>) -> Brick {
+        Brick { brick_variants }
     }
     fn all_bricks() -> Vec<Brick> {
         vec![
-            Brick::create(vec![
-                0b01100000_01000000_11000000 << (5 * 8),
-                0b11000000_01000000_01100000 << (5 * 8),
-                0b10000000_11100000_00100000 << (5 * 8),
-                0b00100000_11100000_10000000 << (5 * 8),
+            Brick::new(vec![
+                BrickVariant::new(0b01100000_01000000_11000000 << (5 * 8)),
+                BrickVariant::new(0b11000000_01000000_01100000 << (5 * 8)),
+                BrickVariant::new(0b10000000_11100000_00100000 << (5 * 8)),
+                BrickVariant::new(0b00100000_11100000_10000000 << (5 * 8)),
             ]),
-            Brick::create(vec![
-                0b00010000_11110000 << (6 * 8),
-                0b10000000_11110000 << (6 * 8),
-                0b11110000_00010000 << (6 * 8),
-                0b11110000_10000000 << (6 * 8),
-                0b10000000_10000000_10000000_11000000 << (4 * 8),
-                0b01000000_01000000_01000000_11000000 << (4 * 8),
-                0b11000000_10000000_10000000_10000000 << (4 * 8),
-                0b11000000_01000000_01000000_01000000 << (4 * 8),
+            Brick::new(vec![
+                BrickVariant::new(0b00010000_11110000 << (6 * 8)),
+                BrickVariant::new(0b10000000_11110000 << (6 * 8)),
+                BrickVariant::new(0b11110000_00010000 << (6 * 8)),
+                BrickVariant::new(0b11110000_10000000 << (6 * 8)),
+                BrickVariant::new(0b10000000_10000000_10000000_11000000 << (4 * 8)),
+                BrickVariant::new(0b01000000_01000000_01000000_11000000 << (4 * 8)),
+                BrickVariant::new(0b11000000_10000000_10000000_10000000 << (4 * 8)),
+                BrickVariant::new(0b11000000_01000000_01000000_01000000 << (4 * 8)),
             ]),
-            Brick::create(vec![
-                0b11100000_10000000_10000000 << (5 * 8),
-                0b11100000_00100000_00100000 << (5 * 8),
-                0b00100000_00100000_11100000 << (5 * 8),
-                0b10000000_10000000_11100000 << (5 * 8),
+            Brick::new(vec![
+                BrickVariant::new(0b11100000_10000000_10000000 << (5 * 8)),
+                BrickVariant::new(0b11100000_00100000_00100000 << (5 * 8)),
+                BrickVariant::new(0b00100000_00100000_11100000 << (5 * 8)),
+                BrickVariant::new(0b10000000_10000000_11100000 << (5 * 8)),
             ]),
-            Brick::create(vec![
-                0b11100000_11100000 << (6 * 8),
-                0b11000000_11000000_11000000 << (5 * 8),
+            Brick::new(vec![
+                BrickVariant::new(0b11100000_11100000 << (6 * 8)),
+                BrickVariant::new(0b11000000_11000000_11000000 << (5 * 8)),
             ]),
-            Brick::create(vec![
-                0b11100000_10100000 << (6 * 8),
-                0b10100000_11100000 << (6 * 8),
-                0b11000000_10000000_11000000 << (5 * 8),
-                0b11000000_01000000_11000000 << (5 * 8),
+            Brick::new(vec![
+                BrickVariant::new(0b11100000_10100000 << (6 * 8)),
+                BrickVariant::new(0b10100000_11100000 << (6 * 8)),
+                BrickVariant::new(0b11000000_10000000_11000000 << (5 * 8)),
+                BrickVariant::new(0b11000000_01000000_11000000 << (5 * 8)),
             ]),
-            Brick::create(vec![
-                0b11100000_11000000 << (6 * 8),
-                0b11000000_11100000 << (6 * 8),
-                0b11100000_01100000 << (6 * 8),
-                0b01100000_11100000 << (6 * 8),
-                0b11000000_11000000_10000000 << (5 * 8),
-                0b11000000_11000000_01000000 << (5 * 8),
-                0b10000000_11000000_11000000 << (5 * 8),
-                0b01000000_11000000_11000000 << (5 * 8),
+            Brick::new(vec![
+                BrickVariant::new(0b11100000_11000000 << (6 * 8)),
+                BrickVariant::new(0b11000000_11100000 << (6 * 8)),
+                BrickVariant::new(0b11100000_01100000 << (6 * 8)),
+                BrickVariant::new(0b01100000_11100000 << (6 * 8)),
+                BrickVariant::new(0b11000000_11000000_10000000 << (5 * 8)),
+                BrickVariant::new(0b11000000_11000000_01000000 << (5 * 8)),
+                BrickVariant::new(0b10000000_11000000_11000000 << (5 * 8)),
+                BrickVariant::new(0b01000000_11000000_11000000 << (5 * 8)),
             ]),
-            Brick::create(vec![
-                0b11110000_01000000 << (6 * 8),
-                0b11110000_00100000 << (6 * 8),
-                0b01000000_11110000 << (6 * 8),
-                0b00100000_11110000 << (6 * 8),
-                0b10000000_11000000_10000000_10000000 << (4 * 8),
-                0b10000000_10000000_11000000_10000000 << (4 * 8),
-                0b01000000_11000000_01000000_01000000 << (4 * 8),
-                0b01000000_01000000_11000000_01000000 << (4 * 8),
+            Brick::new(vec![
+                BrickVariant::new(0b11110000_01000000 << (6 * 8)),
+                BrickVariant::new(0b11110000_00100000 << (6 * 8)),
+                BrickVariant::new(0b01000000_11110000 << (6 * 8)),
+                BrickVariant::new(0b00100000_11110000 << (6 * 8)),
+                BrickVariant::new(0b10000000_11000000_10000000_10000000 << (4 * 8)),
+                BrickVariant::new(0b10000000_10000000_11000000_10000000 << (4 * 8)),
+                BrickVariant::new(0b01000000_11000000_01000000_01000000 << (4 * 8)),
+                BrickVariant::new(0b01000000_01000000_11000000_01000000 << (4 * 8)),
             ]),
-            Brick::create(vec![
-                0b11100000_00110000 << (6 * 8),
-                0b01110000_11000000 << (6 * 8),
-                0b11000000_01110000 << (6 * 8),
-                0b00110000_11100000 << (6 * 8),
-                0b10000000_10000000_11000000_01000000 << (4 * 8),
-                0b01000000_11000000_10000000_10000000 << (4 * 8),
-                0b10000000_11000000_01000000_01000000 << (4 * 8),
-                0b01000000_01000000_11000000_10000000 << (4 * 8),
+            Brick::new(vec![
+                BrickVariant::new(0b11100000_00110000 << (6 * 8)),
+                BrickVariant::new(0b01110000_11000000 << (6 * 8)),
+                BrickVariant::new(0b11000000_01110000 << (6 * 8)),
+                BrickVariant::new(0b00110000_11100000 << (6 * 8)),
+                BrickVariant::new(0b10000000_10000000_11000000_01000000 << (4 * 8)),
+                BrickVariant::new(0b01000000_11000000_10000000_10000000 << (4 * 8)),
+                BrickVariant::new(0b10000000_11000000_01000000_01000000 << (4 * 8)),
+                BrickVariant::new(0b01000000_01000000_11000000_10000000 << (4 * 8)),
             ]),
         ]
     }
