@@ -176,12 +176,12 @@ impl BrickVariant {
 
 #[derive(Clone)]
 struct Brick {
-    brick_variants: Vec<BrickVariant>,
+    brick_variants: Box<[BrickVariant]>,
 }
 
 impl Brick {
     fn new(brick_variants: Vec<BrickVariant>) -> Brick {
-        Brick { brick_variants }
+        Brick { brick_variants: brick_variants.into() }
     }
     fn all_bricks() -> Vec<Brick> {
         vec![
