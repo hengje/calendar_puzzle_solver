@@ -180,18 +180,18 @@ struct Brick {
 }
 
 impl Brick {
-    fn new(brick_variants: Vec<BrickVariant>) -> Brick {
-        Brick { brick_variants: brick_variants.into() }
+    fn new(brick_variants: Box<[BrickVariant]>) -> Brick {
+        Brick { brick_variants }
     }
     fn all_bricks() -> Vec<Brick> {
         vec![
-            Brick::new(vec![
+            Brick::new(Box::new([
                 BrickVariant::new(0b01100000_01000000_11000000 << (5 * 8)),
                 BrickVariant::new(0b11000000_01000000_01100000 << (5 * 8)),
                 BrickVariant::new(0b10000000_11100000_00100000 << (5 * 8)),
                 BrickVariant::new(0b00100000_11100000_10000000 << (5 * 8)),
-            ]),
-            Brick::new(vec![
+            ])),
+            Brick::new(Box::new([
                 BrickVariant::new(0b00010000_11110000 << (6 * 8)),
                 BrickVariant::new(0b10000000_11110000 << (6 * 8)),
                 BrickVariant::new(0b11110000_00010000 << (6 * 8)),
@@ -200,24 +200,24 @@ impl Brick {
                 BrickVariant::new(0b01000000_01000000_01000000_11000000 << (4 * 8)),
                 BrickVariant::new(0b11000000_10000000_10000000_10000000 << (4 * 8)),
                 BrickVariant::new(0b11000000_01000000_01000000_01000000 << (4 * 8)),
-            ]),
-            Brick::new(vec![
+            ])),
+            Brick::new(Box::new([
                 BrickVariant::new(0b11100000_10000000_10000000 << (5 * 8)),
                 BrickVariant::new(0b11100000_00100000_00100000 << (5 * 8)),
                 BrickVariant::new(0b00100000_00100000_11100000 << (5 * 8)),
                 BrickVariant::new(0b10000000_10000000_11100000 << (5 * 8)),
-            ]),
-            Brick::new(vec![
+            ])),
+            Brick::new(Box::new([
                 BrickVariant::new(0b11100000_11100000 << (6 * 8)),
                 BrickVariant::new(0b11000000_11000000_11000000 << (5 * 8)),
-            ]),
-            Brick::new(vec![
+            ])),
+            Brick::new(Box::new([
                 BrickVariant::new(0b11100000_10100000 << (6 * 8)),
                 BrickVariant::new(0b10100000_11100000 << (6 * 8)),
                 BrickVariant::new(0b11000000_10000000_11000000 << (5 * 8)),
                 BrickVariant::new(0b11000000_01000000_11000000 << (5 * 8)),
-            ]),
-            Brick::new(vec![
+            ])),
+            Brick::new(Box::new([
                 BrickVariant::new(0b11100000_11000000 << (6 * 8)),
                 BrickVariant::new(0b11000000_11100000 << (6 * 8)),
                 BrickVariant::new(0b11100000_01100000 << (6 * 8)),
@@ -226,8 +226,8 @@ impl Brick {
                 BrickVariant::new(0b11000000_11000000_01000000 << (5 * 8)),
                 BrickVariant::new(0b10000000_11000000_11000000 << (5 * 8)),
                 BrickVariant::new(0b01000000_11000000_11000000 << (5 * 8)),
-            ]),
-            Brick::new(vec![
+            ])),
+            Brick::new(Box::new([
                 BrickVariant::new(0b11110000_01000000 << (6 * 8)),
                 BrickVariant::new(0b11110000_00100000 << (6 * 8)),
                 BrickVariant::new(0b01000000_11110000 << (6 * 8)),
@@ -236,8 +236,8 @@ impl Brick {
                 BrickVariant::new(0b10000000_10000000_11000000_10000000 << (4 * 8)),
                 BrickVariant::new(0b01000000_11000000_01000000_01000000 << (4 * 8)),
                 BrickVariant::new(0b01000000_01000000_11000000_01000000 << (4 * 8)),
-            ]),
-            Brick::new(vec![
+            ])),
+            Brick::new(Box::new([
                 BrickVariant::new(0b11100000_00110000 << (6 * 8)),
                 BrickVariant::new(0b01110000_11000000 << (6 * 8)),
                 BrickVariant::new(0b11000000_01110000 << (6 * 8)),
@@ -246,7 +246,7 @@ impl Brick {
                 BrickVariant::new(0b01000000_11000000_10000000_10000000 << (4 * 8)),
                 BrickVariant::new(0b10000000_11000000_01000000_01000000 << (4 * 8)),
                 BrickVariant::new(0b01000000_01000000_11000000_10000000 << (4 * 8)),
-            ]),
+            ])),
         ]
     }
 }
