@@ -65,7 +65,6 @@ fn print_board(board: &SolvedBoard) {
 fn brick_dot<'a>(brick_number: u8) -> ANSIGenericString<'a, str> {
     match brick_number {
         0 => Style::new().bold().paint("O"),
-        1..=8 => Color::Black.on(Fixed(brick_number)).paint("■"),
-        _ => ANSIGenericString::from(brick_number.to_string()),
+        brick_number => Color::Black.on(Fixed(brick_number)).paint("■"),
     }
 }
