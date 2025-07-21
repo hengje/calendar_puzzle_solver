@@ -39,9 +39,9 @@ fn main() {
 fn print_board(board: &SolvedBoard) {
     let mut result: [u8; 51] = [0; 51];
     for (brick_number, brick) in board.placed_bricks.iter().enumerate() {
-        for i in 0..=50 {
+        for (i, result) in result.iter_mut().enumerate() {
             if 1 << 63 >> i & brick > 0 {
-                result[i] = brick_number as u8 + 1;
+                *result = brick_number as u8 + 1;
             }
         }
     }

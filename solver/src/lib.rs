@@ -1,5 +1,3 @@
-use std::fmt;
-
 #[derive(Debug, PartialEq, Clone)]
 pub struct Board {
     bitboard: u64,
@@ -48,7 +46,7 @@ impl Board {
     }
 }
 
-pub fn solve(initial_board: Board, bricks: &Vec<Brick>) -> impl Iterator<Item = SolvedBoard> {
+pub fn solve(initial_board: Board, bricks: &[Brick]) -> impl Iterator<Item = SolvedBoard> {
     SolveIterator::new(initial_board, bricks)
 }
 
@@ -94,31 +92,6 @@ impl Iterator for ValidPlacementIterator<'_> {
     }
 }
 
-impl fmt::Display for Board {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        let mut result: [u8; 51] = [0; 51];
-        for (brick_number, brick) in self.placed_bricks.iter().enumerate() {
-            for i in 0..=50 {
-                if 1 << 63 >> i & brick > 0 {
-                    result[i] = brick_number as u8 + 1;
-                }
-            }
-        }
-        for lines in result.chunks(8) {
-            for b in lines {
-                if *b > 0_u8 {
-                    write!(f, "{b}")?;
-                } else {
-                    write!(f, " ")?;
-                }
-            }
-            writeln!(f)?;
-        }
-        writeln!(f)?;
-        Ok(())
-    }
-}
-
 pub struct SolvedBoard {
     pub placed_bricks: Vec<u64>,
     pub test_count: u32,
@@ -130,10 +103,9 @@ struct SolveIterator<'a> {
 }
 
 impl<'a> SolveIterator<'a> {
-    fn new(board: Board, bricks: &'a Vec<Brick>) -> Self {
-        let initial_slice = &bricks[..];
+    fn new(board: Board, bricks: &'a [Brick]) -> Self {
         SolveIterator {
-            stack: vec![(board, initial_slice)],
+            stack: vec![(board, bricks)],
             test_count: 0,
         }
     }
