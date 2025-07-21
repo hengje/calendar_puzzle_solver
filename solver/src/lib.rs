@@ -32,7 +32,7 @@ impl Board {
     }
 
     fn set_index(&mut self, index: u8) {
-        self.bitboard = self.bitboard | 1u64 << 63 >> index;
+        self.bitboard |= 1u64 << 63 >> index;
     }
 
     #[allow(dead_code)] // Only used in tests
@@ -107,7 +107,7 @@ impl fmt::Display for Board {
         for lines in result.chunks(8) {
             for b in lines {
                 if *b > 0_u8 {
-                    write!(f, "{}", b)?;
+                    write!(f, "{b}")?;
                 } else {
                     write!(f, " ")?;
                 }
@@ -277,17 +277,17 @@ mod tests {
         println!("{:b}", 1u64 << 63);
 
         for idx in empty_free_indexes {
-            println!("Checking idx {}", idx);
+            println!("Checking idx {idx}");
             assert!(empty_board.is_free(idx));
             assert!(!empty_board.is_occupied(idx));
         }
         for idx in empty_occupied_indexes {
-            println!("Checking idx {}", idx);
+            println!("Checking idx {idx}");
             assert!(empty_board.is_occupied(idx));
             assert!(!empty_board.is_free(idx));
         }
 
-        assert_eq!(empty_board.is_free(0), true);
+        assert!(empty_board.is_free(0));
     }
 
     #[test]

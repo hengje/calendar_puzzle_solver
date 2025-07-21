@@ -23,8 +23,8 @@ fn main() {
     let day = cli.day.unwrap_or_else(|| current_date.day() as u8);
 
     let start = Instant::now();
-    println!("Solving for day {} and month {}", day, month);
-    let board = Board::for_date(day as u8, month as u8);
+    println!("Solving for day {day} and month {month}");
+    let board = Board::for_date(day, month);
     for (i, solved_board) in solve(board.unwrap(), &Brick::all_bricks()).enumerate() {
         println!(
             "Solution {} (time used:{:?}, test count: {}):",
