@@ -17,7 +17,7 @@ struct Cli {
 }
 
 fn main() {
-    let current_date = chrono::Utc::now();
+    let current_date = chrono::Local::now();
     let cli = Cli::parse();
     let month = cli.month.unwrap_or_else(|| current_date.month() as u8);
     let day = cli.day.unwrap_or_else(|| current_date.day() as u8);
