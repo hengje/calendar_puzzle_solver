@@ -31,10 +31,6 @@ impl Board {
         Ok(empty_board)
     }
 
-    pub fn solve(self) -> impl Iterator<Item = SolvedBoard> {
-        SolveIterator::new(self, Brick::all_bricks())
-    }
-
     fn set_index(&mut self, index: u8) {
         self.bitboard = self.bitboard | 1u64 << 63 >> index;
     }
@@ -50,6 +46,10 @@ impl Board {
     fn valid_placements<'a>(&'a self, brick: &'a Brick) -> ValidPlacementIterator<'a> {
         ValidPlacementIterator::new(self, brick)
     }
+}
+
+pub fn solve(initial_board: Board, bricks: &Vec<Brick>) -> impl Iterator<Item = SolvedBoard> {
+    SolveIterator::new(initial_board, bricks)
 }
 
 struct ValidPlacementIterator<'a> {
@@ -124,25 +124,26 @@ pub struct SolvedBoard {
     pub test_count: u32,
 }
 
-struct SolveIterator {
-    stack: Vec<(Board, Vec<Brick>)>,
+struct SolveIterator<'a> {
+    stack: Vec<(Board, &'a [Brick])>,
     test_count: u32,
 }
 
-impl SolveIterator {
-    fn new(board: Board, remaining_bricks: Vec<Brick>) -> Self {
+impl<'a> SolveIterator<'a> {
+    fn new(board: Board, bricks: &'a Vec<Brick>) -> Self {
+        let initial_slice = &bricks[..];
         SolveIterator {
-            stack: vec![(board, remaining_bricks)],
+            stack: vec![(board, initial_slice)],
             test_count: 0,
         }
     }
 }
 
-impl Iterator for SolveIterator {
+impl<'a> Iterator for SolveIterator<'a> {
     type Item = SolvedBoard;
 
     fn next(&mut self) -> Option<Self::Item> {
-        while let Some((current_board, mut bricks)) = self.stack.pop() {
+        while let Some((current_board, bricks)) = self.stack.pop() {
             self.test_count += 1;
             if bricks.is_empty() {
                 return Some(SolvedBoard {
@@ -151,10 +152,10 @@ impl Iterator for SolveIterator {
                 });
             }
 
-            if let Some(brick) = bricks.pop() {
-                let valid_placements = current_board.valid_placements(&brick);
+            if let Some((brick, remaining)) = bricks.split_first() {
+                let valid_placements = current_board.valid_placements(brick);
                 for valid_placement in valid_placements {
-                    self.stack.push((valid_placement, bricks.clone()));
+                    self.stack.push((valid_placement, remaining));
                 }
             }
         }
@@ -175,7 +176,7 @@ impl BrickVariant {
 }
 
 #[derive(Clone)]
-struct Brick {
+pub struct Brick {
     brick_variants: Box<[BrickVariant]>,
 }
 
@@ -183,7 +184,7 @@ impl Brick {
     fn new(brick_variants: Box<[BrickVariant]>) -> Brick {
         Brick { brick_variants }
     }
-    fn all_bricks() -> Vec<Brick> {
+    pub fn all_bricks() -> Vec<Brick> {
         vec![
             Brick::new(Box::new([
                 BrickVariant::new(0b01100000_01000000_11000000 << (5 * 8)),
@@ -305,14 +306,14 @@ mod tests {
     #[test]
     fn solve_jan_1() {
         let board = Board::for_date(1, 1).unwrap(); // January 1st.
-        let solutions = board.solve().collect::<Vec<_>>();
+        let solutions = solve(board, &Brick::all_bricks()).collect::<Vec<_>>();
         assert_eq!(solutions.len(), 64);
     }
 
     #[test]
     fn solve_dec_31() {
         let board = Board::for_date(31, 12).unwrap(); // December 31st.
-        let solutions = board.solve().collect::<Vec<_>>();
+        let solutions = solve(board, &Brick::all_bricks()).collect::<Vec<_>>();
         assert_eq!(solutions.len(), 77);
     }
 }

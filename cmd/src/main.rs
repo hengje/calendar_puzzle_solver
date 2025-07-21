@@ -2,7 +2,7 @@ use ansi_term::Color::Fixed;
 use ansi_term::{ANSIGenericString, Color, Style};
 use chrono::Datelike;
 use clap::Parser;
-use solver::{Board, SolvedBoard};
+use solver::{Board, Brick, SolvedBoard, solve};
 use std::time::Instant;
 
 #[derive(Parser)]
@@ -25,7 +25,7 @@ fn main() {
     let start = Instant::now();
     println!("Solving for day {} and month {}", day, month);
     let board = Board::for_date(day as u8, month as u8);
-    for (i, solved_board) in board.unwrap().solve().enumerate() {
+    for (i, solved_board) in solve(board.unwrap(), &Brick::all_bricks()).enumerate() {
         println!(
             "Solution {} (time used:{:?}, test count: {}):",
             i + 1,
