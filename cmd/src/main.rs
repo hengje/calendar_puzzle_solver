@@ -2,9 +2,9 @@ use ansi_term::Color::Fixed;
 use ansi_term::{ANSIGenericString, Color, Style};
 use chrono::Datelike;
 use clap::Parser;
+use rand::seq::IndexedRandom;
 use solver::{Board, Brick, SolvedBoard, solve};
 use std::time::Instant;
-
 #[derive(Parser)]
 #[command(version, about)]
 struct Cli {
@@ -49,10 +49,15 @@ fn main() {
                 None => {
                     println!("No solutions found!")
                 }
-                Some(mut solved_board) => {
-                    solved_board
+                Some(solved_board) => {
+                    let mut rng = rand::rng();
+                    let random_bricks = solved_board
                         .placed_bricks
-                        .truncate(number_of_hints as usize);
+                        .choose_multiple(&mut rng, number_of_hints as usize);
+                    let solved_board = SolvedBoard {
+                        placed_bricks: random_bricks.cloned().collect(),
+                        test_count: solved_board.test_count,
+                    };
                     print_board(&solved_board);
                 }
             }
