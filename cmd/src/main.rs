@@ -14,6 +14,9 @@ struct Cli {
     #[arg(short, long, value_parser = clap::value_parser!(u8).range(1..=12))]
     /// Month to solve for (1-12). If not specified, the current month is used.
     month: Option<u8>,
+    #[arg(short = 'H', long = "hint")]
+    /// Just give a hint without solving the whole board. Default number of bricks to give as hint is 1.
+    hint: Option<Option<u8>>,
 }
 
 fn main() {
@@ -25,14 +28,35 @@ fn main() {
     let start = Instant::now();
     println!("Solving for day {day} and month {month}");
     let board = Board::for_date(day, month);
-    for (i, solved_board) in solve(board.unwrap(), &Brick::all_bricks()).enumerate() {
-        println!(
-            "Solution {} (time used:{:?}, test count: {}):",
-            i + 1,
-            start.elapsed(),
-            solved_board.test_count
-        );
-        print_board(&solved_board);
+    match cli.hint {
+        None => {
+            for (i, solved_board) in solve(board.unwrap(), &Brick::all_bricks()).enumerate() {
+                println!(
+                    "Solution {} (time used:{:?}, test count: {}):",
+                    i + 1,
+                    start.elapsed(),
+                    solved_board.test_count
+                );
+                print_board(&solved_board);
+            }
+        }
+        Some(number_of_hints) => {
+            let number_of_hints = number_of_hints.unwrap_or(1).min(8);
+            let all_bricks = &Brick::all_bricks();
+            let mut solved_boards = solve(board.unwrap(), all_bricks);
+            let solved_board = solved_boards.next();
+            match solved_board {
+                None => {
+                    println!("No solutions found!")
+                }
+                Some(mut solved_board) => {
+                    solved_board
+                        .placed_bricks
+                        .truncate(number_of_hints as usize);
+                    print_board(&solved_board);
+                }
+            }
+        }
     }
 }
 

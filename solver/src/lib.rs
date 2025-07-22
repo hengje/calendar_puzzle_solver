@@ -104,8 +104,10 @@ struct SolveIterator<'a> {
 
 impl<'a> SolveIterator<'a> {
     fn new(board: Board, bricks: &'a [Brick]) -> Self {
+        let mut initial_stack = Vec::with_capacity(256);
+        initial_stack.push((board, bricks));
         SolveIterator {
-            stack: vec![(board, bricks)],
+            stack: initial_stack,
             test_count: 0,
         }
     }
