@@ -1,3 +1,5 @@
+use rand::seq::SliceRandom;
+
 #[derive(Debug, PartialEq, Clone)]
 pub struct Board {
     bitboard: u64,
@@ -158,8 +160,8 @@ impl Brick {
     fn new(brick_variants: Box<[BrickVariant]>) -> Brick {
         Brick { brick_variants }
     }
-    pub fn all_bricks() -> Vec<Brick> {
-        vec![
+    pub fn all_bricks() -> Box<[Brick]> {
+        Box::new([
             Brick::new(Box::new([
                 BrickVariant::new(0b01100000_01000000_11000000 << (5 * 8)),
                 BrickVariant::new(0b11000000_01000000_01100000 << (5 * 8)),
@@ -222,7 +224,17 @@ impl Brick {
                 BrickVariant::new(0b10000000_11000000_01000000_01000000 << (4 * 8)),
                 BrickVariant::new(0b01000000_01000000_11000000_10000000 << (4 * 8)),
             ])),
-        ]
+        ])
+    }
+
+    pub fn all_bricks_in_random_order() -> Box<[Brick]> {
+        let mut rng = rand::rng();
+        let mut all_bricks = Self::all_bricks();
+        all_bricks.shuffle(&mut rng);
+        for brick in &mut all_bricks {
+            brick.brick_variants.shuffle(&mut rng);
+        }
+        all_bricks
     }
 }
 
@@ -282,6 +294,11 @@ mod tests {
         let board = Board::for_date(1, 1).unwrap(); // January 1st.
         let solutions = solve(board, &Brick::all_bricks()).collect::<Vec<_>>();
         assert_eq!(solutions.len(), 64);
+        assert!(
+            solutions.last().unwrap().test_count <= 4_704_245,
+            "Regression, used {} tests",
+            solutions.last().unwrap().test_count
+        );
     }
 
     #[test]
@@ -289,5 +306,22 @@ mod tests {
         let board = Board::for_date(31, 12).unwrap(); // December 31st.
         let solutions = solve(board, &Brick::all_bricks()).collect::<Vec<_>>();
         assert_eq!(solutions.len(), 77);
+        assert!(
+            solutions.last().unwrap().test_count <= 4_790_901,
+            "Regression, used {} tests",
+            solutions.last().unwrap().test_count
+        );
+    }
+
+    #[test]
+    fn solve_sep_22() {
+        let board = Board::for_date(22, 9).unwrap(); // December 31st.
+        let solutions = solve(board, &Brick::all_bricks()).collect::<Vec<_>>();
+        assert_eq!(solutions.len(), 29);
+        assert!(
+            solutions.last().unwrap().test_count <= 1_983_044,
+            "Regression, used {} tests",
+            solutions.last().unwrap().test_count
+        );
     }
 }
