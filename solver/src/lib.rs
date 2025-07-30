@@ -1,5 +1,4 @@
 use std::collections::HashMap;
-use rand::seq::SliceRandom;
 
 #[derive(Debug, PartialEq, Clone)]
 pub struct Board {
@@ -53,14 +52,20 @@ pub fn solve(initial_board: Board, bricks: &[Brick]) -> impl Iterator<Item = Sol
     SolveIterator::new(initial_board, bricks)
 }
 
-pub fn hints(board: Board, bricks: &[Brick]) -> Vec<Hint>{
-    let mut  brick_in_solution: HashMap<u64, usize> = HashMap::new();
+pub fn hints(board: Board, bricks: &[Brick]) -> Vec<Hint> {
+    let mut brick_in_solution: HashMap<u64, usize> = HashMap::new();
     for solution in solve(board, bricks) {
         for brick in solution.placed_bricks {
             *brick_in_solution.entry(brick).or_default() += 1;
         }
     }
-    let mut hints: Vec<Hint> = brick_in_solution.iter().map(|(brick,  solutions)| Hint { brick: *brick, solutions: *solutions}).collect();
+    let mut hints: Vec<Hint> = brick_in_solution
+        .iter()
+        .map(|(brick, solutions)| Hint {
+            brick: *brick,
+            solutions: *solutions,
+        })
+        .collect();
     hints.sort_unstable_by(|hint1, hint2| hint2.solutions.cmp(&hint1.solutions));
     hints
 }
@@ -244,16 +249,6 @@ impl Brick {
             ])),
         ])
     }
-
-    pub fn all_bricks_in_random_order() -> Box<[Brick]> {
-        let mut rng = rand::rng();
-        let mut all_bricks = Self::all_bricks();
-        all_bricks.shuffle(&mut rng);
-        for brick in &mut all_bricks {
-            brick.brick_variants.shuffle(&mut rng);
-        }
-        all_bricks
-    }
 }
 
 #[cfg(test)]
@@ -354,5 +349,4 @@ mod tests {
         // The "worst" hint has only one possible solution
         assert_eq!(hints.last().unwrap().solutions, 1);
     }
-
 }

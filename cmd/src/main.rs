@@ -2,8 +2,7 @@ use ansi_term::Color::Fixed;
 use ansi_term::{ANSIGenericString, Color, Style};
 use chrono::Datelike;
 use clap::Parser;
-use rand::seq::IndexedRandom;
-use solver::{Board, Brick, SolvedBoard, solve};
+use solver::{Board, Brick, SolvedBoard, hints, solve};
 use std::time::Instant;
 #[derive(Parser)]
 #[command(version, about)]
@@ -15,7 +14,7 @@ struct Cli {
     /// Month to solve for (1-12). If not specified, the current month is used.
     month: Option<u8>,
     #[arg(short = 'H', long = "hint")]
-    /// Just give a hint without solving the whole board. Default number of bricks to give as hint is 1.
+    /// Just give a brick as a hint without showing the full solution. Default number of hints to give is 1.
     hint: Option<Option<u8>>,
 }
 
@@ -41,33 +40,24 @@ fn main() {
             }
         }
         Some(number_of_hints) => {
-            let number_of_hints = number_of_hints.unwrap_or(1).min(8);
+            let number_of_hints = number_of_hints.unwrap_or(1);
             let all_bricks = &Brick::all_bricks();
-            let mut solved_boards = solve(board.unwrap(), all_bricks);
-            let solved_board = solved_boards.next();
-            match solved_board {
-                None => {
-                    println!("No solutions found!")
-                }
-                Some(solved_board) => {
-                    let mut rng = rand::rng();
-                    let random_bricks = solved_board
-                        .placed_bricks
-                        .choose_multiple(&mut rng, number_of_hints as usize);
-                    let solved_board = SolvedBoard {
-                        placed_bricks: random_bricks.cloned().collect(),
-                        test_count: solved_board.test_count,
-                    };
-                    print_board(&solved_board);
+            let all_hints = hints(board.unwrap(), all_bricks);
+            if all_hints.is_empty() {
+                eprintln!("ERROR: No hints found!")
+            } else {
+                for (i, hint) in all_hints.iter().enumerate().take(number_of_hints as usize) {
+                    println!("\nHint {} has {} possible solutions", i + 1, hint.solutions);
+                    print_bricks(&[hint.brick])
                 }
             }
         }
     }
 }
 
-fn print_board(board: &SolvedBoard) {
+fn print_bricks(bricks: &[u64]) {
     let mut result: [u8; 51] = [0; 51];
-    for (brick_number, brick) in board.placed_bricks.iter().enumerate() {
+    for (brick_number, brick) in bricks.iter().enumerate() {
         for (i, result) in result.iter_mut().enumerate() {
             if 1 << 63 >> i & brick > 0 {
                 *result = brick_number as u8 + 1;
@@ -89,6 +79,10 @@ fn print_board(board: &SolvedBoard) {
         };
     }
     println!("╚═══╝");
+}
+
+fn print_board(board: &SolvedBoard) {
+    print_bricks(board.placed_bricks.as_slice());
 }
 
 fn brick_dot<'a>(brick_number: u8) -> ANSIGenericString<'a, str> {
