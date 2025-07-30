@@ -192,6 +192,12 @@ impl Brick {
                 BrickVariant::new(0b00100000_11100000_10000000 << (5 * 8)),
             ])),
             Brick::new(Box::new([
+                BrickVariant::new(0b11100000_10000000_10000000 << (5 * 8)),
+                BrickVariant::new(0b11100000_00100000_00100000 << (5 * 8)),
+                BrickVariant::new(0b00100000_00100000_11100000 << (5 * 8)),
+                BrickVariant::new(0b10000000_10000000_11100000 << (5 * 8)),
+            ])),
+            Brick::new(Box::new([
                 BrickVariant::new(0b00010000_11110000 << (6 * 8)),
                 BrickVariant::new(0b10000000_11110000 << (6 * 8)),
                 BrickVariant::new(0b11110000_00010000 << (6 * 8)),
@@ -200,12 +206,6 @@ impl Brick {
                 BrickVariant::new(0b01000000_01000000_01000000_11000000 << (4 * 8)),
                 BrickVariant::new(0b11000000_10000000_10000000_10000000 << (4 * 8)),
                 BrickVariant::new(0b11000000_01000000_01000000_01000000 << (4 * 8)),
-            ])),
-            Brick::new(Box::new([
-                BrickVariant::new(0b11100000_10000000_10000000 << (5 * 8)),
-                BrickVariant::new(0b11100000_00100000_00100000 << (5 * 8)),
-                BrickVariant::new(0b00100000_00100000_11100000 << (5 * 8)),
-                BrickVariant::new(0b10000000_10000000_11100000 << (5 * 8)),
             ])),
             Brick::new(Box::new([
                 BrickVariant::new(0b11100000_11100000 << (6 * 8)),
@@ -308,7 +308,7 @@ mod tests {
         let solutions = solve(board, &Brick::all_bricks()).collect::<Vec<_>>();
         assert_eq!(solutions.len(), 64);
         assert!(
-            solutions.last().unwrap().test_count <= 4_704_245,
+            solutions.last().unwrap().test_count <= 4_697_786,
             "Regression, used {} tests",
             solutions.last().unwrap().test_count
         );
@@ -320,7 +320,7 @@ mod tests {
         let solutions = solve(board, &Brick::all_bricks()).collect::<Vec<_>>();
         assert_eq!(solutions.len(), 77);
         assert!(
-            solutions.last().unwrap().test_count <= 4_790_901,
+            solutions.last().unwrap().test_count <= 4_788_190,
             "Regression, used {} tests",
             solutions.last().unwrap().test_count
         );
@@ -332,7 +332,7 @@ mod tests {
         let solutions = solve(board, &Brick::all_bricks()).collect::<Vec<_>>();
         assert_eq!(solutions.len(), 29);
         assert!(
-            solutions.last().unwrap().test_count <= 1_983_044,
+            solutions.last().unwrap().test_count <= 1_970_028,
             "Regression, used {} tests",
             solutions.last().unwrap().test_count
         );
