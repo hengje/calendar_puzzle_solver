@@ -1,3 +1,4 @@
+use std::collections::HashMap;
 use rand::seq::SliceRandom;
 
 #[derive(Debug, PartialEq, Clone)]
@@ -50,6 +51,23 @@ impl Board {
 
 pub fn solve(initial_board: Board, bricks: &[Brick]) -> impl Iterator<Item = SolvedBoard> {
     SolveIterator::new(initial_board, bricks)
+}
+
+pub fn hints(board: Board, bricks: &[Brick]) -> Vec<Hint>{
+    let mut  brick_in_solution: HashMap<u64, usize> = HashMap::new();
+    for solution in solve(board, bricks) {
+        for brick in solution.placed_bricks {
+            *brick_in_solution.entry(brick).or_default() += 1;
+        }
+    }
+    let mut hints: Vec<Hint> = brick_in_solution.iter().map(|(brick,  solutions)| Hint { brick: *brick, solutions: *solutions}).collect();
+    hints.sort_unstable_by(|hint1, hint2| hint2.solutions.cmp(&hint1.solutions));
+    hints
+}
+
+pub struct Hint {
+    pub brick: u64,
+    pub solutions: usize,
 }
 
 struct ValidPlacementIterator<'a> {
@@ -324,4 +342,17 @@ mod tests {
             solutions.last().unwrap().test_count
         );
     }
+
+    #[test]
+    fn hints_july_29() {
+        let board = Board::for_date(29, 7).unwrap(); // July 29th.
+        let hints = hints(board, &Brick::all_bricks());
+        // There are 155 possible valid hint bricks
+        assert_eq!(hints.len(), 155);
+        // The "best" hint has 12 possible solutions
+        assert_eq!(hints.first().unwrap().solutions, 12);
+        // The "worst" hint has only one possible solution
+        assert_eq!(hints.last().unwrap().solutions, 1);
+    }
+
 }
