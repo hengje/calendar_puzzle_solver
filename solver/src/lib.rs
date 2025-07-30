@@ -192,14 +192,14 @@ impl Brick {
                 BrickVariant::new(0b00100000_11100000_10000000 << (5 * 8)),
             ])),
             Brick::new(Box::new([
+                BrickVariant::new(0b11100000_11100000 << (6 * 8)),
+                BrickVariant::new(0b11000000_11000000_11000000 << (5 * 8)),
+            ])),
+            Brick::new(Box::new([
                 BrickVariant::new(0b11100000_10000000_10000000 << (5 * 8)),
                 BrickVariant::new(0b11100000_00100000_00100000 << (5 * 8)),
                 BrickVariant::new(0b00100000_00100000_11100000 << (5 * 8)),
                 BrickVariant::new(0b10000000_10000000_11100000 << (5 * 8)),
-            ])),
-            Brick::new(Box::new([
-                BrickVariant::new(0b11100000_11100000 << (6 * 8)),
-                BrickVariant::new(0b11000000_11000000_11000000 << (5 * 8)),
             ])),
             Brick::new(Box::new([
                 BrickVariant::new(0b11100000_10100000 << (6 * 8)),
@@ -308,7 +308,7 @@ mod tests {
         let solutions = solve(board, &Brick::all_bricks()).collect::<Vec<_>>();
         assert_eq!(solutions.len(), 64);
         assert!(
-            solutions.last().unwrap().test_count <= 3_187_890,
+            solutions.last().unwrap().test_count <= 3_139_899,
             "Regression, used {} tests",
             solutions.last().unwrap().test_count
         );
@@ -320,7 +320,7 @@ mod tests {
         let solutions = solve(board, &Brick::all_bricks()).collect::<Vec<_>>();
         assert_eq!(solutions.len(), 77);
         assert!(
-            solutions.last().unwrap().test_count <= 3_193_410,
+            solutions.last().unwrap().test_count <= 3_157_070,
             "Regression, used {} tests",
             solutions.last().unwrap().test_count
         );
@@ -332,7 +332,7 @@ mod tests {
         let solutions = solve(board, &Brick::all_bricks()).collect::<Vec<_>>();
         assert_eq!(solutions.len(), 29);
         assert!(
-            solutions.last().unwrap().test_count <= 1_306_501,
+            solutions.last().unwrap().test_count <= 1_306_469,
             "Regression, used {} tests",
             solutions.last().unwrap().test_count
         );
